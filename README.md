@@ -154,7 +154,25 @@ Select 1
 
 From table table
 ```
+#### Keyword FETCH isn't allowed
+ It's a newer construct in Oracle SQL. The SQL parser that validates PowerQueries is outdated. Replace FETCH keyword with row_number()
 
+#### Query musts and shoulds
+* query name= must.have.five.elements.foo
+* query should have an ORDER BY
+
+#### Selects on the same 'table.field' must have an alias
+```
+SELECT
+p.id 			-- without an alias and then 
+p.id AS contact_id 	-- with an alias second, works
+
+/*
+			-- the reverse 
+p.id AS contact_id 	-- first with an alias and then 
+p.id 			-- without, didn't work 
+*/
+```
 ### Errors
 
 When enabling a plugin it will be validated and sometimes kick errors associated with the format of the SQL. Some errors will also manifest when running a plugin from the *Data Export Manager* screens.
@@ -242,6 +260,9 @@ select distinct
  where teachers.status =1
     and length(teachers.email_addr) >0
 /*
-homeschoolid is directly select'd
-*/
+
+homeschoolid is directly select'd 
+*/ 
  order by teachers.homeschoolid asc
+
+```
