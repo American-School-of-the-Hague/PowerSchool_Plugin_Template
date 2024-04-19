@@ -6,7 +6,7 @@ This template provides:
 
 * Basic structure for plugins
 * Bash script for packaging and versioning plugins
-* `BAT` scripts for automating uploads from PowerSchool server
+* `BAT` script for automating uploads from PowerSchool server
 * `README` template
 
 ## Using a Template
@@ -32,17 +32,37 @@ Following any updates to this plugin, it is necessary to do the following:
 
 ## Usage Information
 
-Any relevant usage information
+Add any relevant usage information
 
 ## Configuration Information
 
 Any relevant information needed to configure the plugin such as Data Export Manager Settings.
 
+## Plugin Documentation
+
+Useful documentation for PowerSchool Plugins
+
+### PowerSchool Documentation
+
+A PowerSchool support login is needed to access this content.
+
+#### [PowerSchool Plugin Developer Documentation](https://support.powerschool.com/developer/#/page/plugins)
+
+* [Plugin XML](https://support.powerschool.com/developer/#/page/plugin-xml)
+* [Plugin Package Structure](https://support.powerschool.com/developer/#/page/plugin-zip)
+* [PowerQuery Structure](https://support.powerschool.com/developer/#/page/powerqueries)
+
+### Other Useful Documentation
+
+#### [PowerSchool Customization - Coding Basic HTML, CSS, LTK, PSHTML and Tools](https://www.psugcal.org/images/4/4d/Customization_2_-_Coding_Basics_in_PowerSchool.pdf)
+
+See FRN (File Reference  Numbers) - useful for creating direct links to student/parent records in output
+
 ## General Plugin Troubleshooting
 
 ### Returned Column References
 
-The `columns` section of the XML document refer to the columsn that will be offered in the _Data Export Manager_ screens. The text of the column name is arbitrary and can be anything, but the `<column column="TABLE.FIELD">` portion **must** referr to a "core" table of powerschool. When in doubt, use `column="STUDENTS.ID"` 
+The `columns` section of the XML document refer to the columns that will be offered in the _Data Export Manager_ screens. The text of the column name is arbitrary and can be anything, but the `<column column="TABLE.FIELD">` portion **must** refer to a "core" table of PowerSchool. When in doubt, use `column="STUDENTS.ID"`
 
 ```XML
 <columns>
@@ -60,25 +80,25 @@ Example:
 
 ```SQL
 <queries>
-	<!--set name here (also applies to permissions_root-->
+    <!--set name here (also applies to permissions_root-->
     <query name="com.foo.bar" coreTable="students" flattened="false">
-		<!--add description here-->
+        <!--add description here-->
         <description>foo example</description>
-		<!--number of columns here must match number sql returns-->
+        <!--number of columns here must match number sql returns-->
         <columns>
-			<column column="STUDENTS.ID">Name</column>
-			<column column="STUDENTS.ID">Date</column>
-			<column column="STUDENTS.ID">Food</column>
- 		</columns>
-		<!--SQL query in format <![CDATA[QUERY]]>-->
+            <column column="STUDENTS.ID">Name</column>
+            <column column="STUDENTS.ID">Date</column>
+            <column column="STUDENTS.ID">Food</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
-			<![CDATA[
-			select 
-				foo.name 		as "Name"
-				foo.date 		as "Date"
-				foo.food		as "Food"
-			from foobartable as foo
-			]]>
+            <![CDATA[
+            select
+                foo.name        as "Name"
+                foo.date        as "Date"
+                foo.food        as "Food"
+            from foobartable as foo
+            ]]>
         </sql>
     </query>
 </queries>
@@ -86,7 +106,7 @@ Example:
 
 ### Core Table
 
-The `coreTable=` value must referr to a known PowerSchool core table. This determines which menu the named query appears in on the _Data Export Manager_ screen. When in doubt, use `students`
+The `coreTable=` value must refer to a known PowerSchool core table. This determines which menu the named query appears in on the _Data Export Manager_ screen. When in doubt, use `students`
 
 Example:
 
@@ -100,7 +120,7 @@ Example:
 
 Long query names will result in odd errors and an inability to install and run the Named Query. The limit is around 100 characters total
 
-Example: 
+Example:
 
 ```xml
 <query name="com.foo.spam_ham_ham_eggs_and_ham" coreTable="students" flattened="false">
@@ -114,12 +134,12 @@ Alternative:
 
 #### Wild-Card Column references in SELECT
 
-While this is completely valid SQL, PowerQuery can't handle it and direct column references should be used. **NB!** There is a counter example to this wehre a wildcard must be used when using CTEs. See the errors section below for more information.
+While this is completely valid SQL, PowerQuery can't handle it and direct column references should be used. **NB!** There is a counter example to this where a wildcard must be used when using CTEs. See the errors section below for more information.
 
 Example:
 
 ```SQL
-Select * 
+Select *
 
 From table table
 ```
@@ -127,6 +147,7 @@ From table table
 When installing the plugin this will result in an error that indicates that the query cannot determine a column name
 
 Alternative:
+
 ```SQL
 -- select the first column
 Select 1
@@ -141,7 +162,7 @@ When enabling a plugin it will be validated and sometimes kick errors associated
 #### Plugin Install Message:  `cannot determine table name of column XXX`
 
 **Case 1 - ORDER BY Mismatch**
-This appears to be due to a column beiing referenced by only the column name in an `ORDER BY` clause.
+This appears to be due to a column that is referenced by only the column name in an `ORDER BY` clause.
 
 Example:
 
@@ -162,21 +183,21 @@ When using CTE joins, you may need to use a `SELECT *` rather than a table alias
 Example:
 
 ```SQL
-	-- CTE use:
-	LEFT JOIN sca_complete contact1 ON contact1.studentdcid = s.dcid AND contact1.contactprio = 1
-	LEFT JOIN sca_complete contact2 ON contact2.studentdcid = s.dcid AND contact2.contactprio = 2
-	WHERE s.enroll_status = 0
-	ORDER BY s.lastfirst
+    -- CTE use:
+    LEFT JOIN sca_complete contact1 ON contact1.studentdcid = s.dcid AND contact1.contactprio = 1
+    LEFT JOIN sca_complete contact2 ON contact2.studentdcid = s.dcid AND contact2.contactprio = 2
+    WHERE s.enroll_status = 0
+    ORDER BY s.lastfirst
 ```
 
 Alternative:
 
 ```SQL
-	LEFT JOIN (SELECT * FROM sca_complete) cone ON cone.studentdcid = s.dcid AND cone.contactprio = 1
-	LEFT JOIN (SELECT * FROM sca_complete) ctwo ON ctwo.studentdcid = s.dcid AND ctwo.contactprio = 2
-	WHERE s.enroll_status = 0
-	ORDER BY s.lastfirst
-	
+    LEFT JOIN (SELECT * FROM sca_complete) cone ON cone.studentdcid = s.dcid AND cone.contactprio = 1
+    LEFT JOIN (SELECT * FROM sca_complete) ctwo ON ctwo.studentdcid = s.dcid AND ctwo.contactprio = 2
+    WHERE s.enroll_status = 0
+    ORDER BY s.lastfirst
+
 ```
 
 #### Data Export Manger Errors
@@ -184,10 +205,9 @@ Alternative:
 * `Unable to execute the query operation due to an invalid parameter. Update your filter values and try again.`
 * `An unexpected error occurred while communicating with the server. Please contact your administrator`
 
-
 These errors tend to be associated with using `order by` statements that are valid SQL, but do not refer to selected columns. To resolve this issue:
 
-* Ensure that all `order by` statements in the SQL query are fields that are directly represented in the `select` section. 
+* Ensure that all `order by` statements in the SQL query are fields that are directly represented in the `select` section.
 * Entirely remove the `order by` statements -- in some cases this resolves the above error entirely
 
 Example:
@@ -205,7 +225,7 @@ select distinct
 /*
 note that the teacher number is not a directly select'd statement.
 In this case it is concat'd to 'T_'
-*/ 
+*/
  order by teachers.teachernumber asc
 ```
 
@@ -222,6 +242,6 @@ select distinct
  where teachers.status =1
     and length(teachers.email_addr) >0
 /*
-homeschoolid is directly select'd 
-*/ 
+homeschoolid is directly select'd
+*/
  order by teachers.homeschoolid asc
